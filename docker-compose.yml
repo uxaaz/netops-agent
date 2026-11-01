@@ -1,0 +1,34 @@
+# 未在本机验证（开发环境无 Docker）。
+# 用途：演示「知识库 Agent + PostgreSQL」的生产编排方式。
+# 当前实现是零依赖内存版，直接 `python -m app.server` 即可运行，不需要本文件。
+
+services:
+  agent:
+    build: .
+    container_name: netops-agent
+    ports:
+      - "8000:8000"
+    environment:
+      # 可选：填入后自动切换到 OpenAICompatAgent（真实模型 + function calling）
+      OPENAI_API_KEY: ""
+      OPENAI_BASE_URL: "https://api.deepseek.com/v1"
+      OPENAI_MODEL: "deepseek-chat"
+      DATABASE_URL: "postgresql://netops:netops@db:5432/netops"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: netops-agent-db
+    environment:
+      POSTGRES_USER: netops
+      POSTGRES_PASSWORD: netops
+      POSTGRES_DB: netops
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:

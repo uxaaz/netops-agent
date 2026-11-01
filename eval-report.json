@@ -1,0 +1,385 @@
+{
+  "generatedAt": "2026-11-02T03:07:09+08:00",
+  "agent": "RuleBasedAgent",
+  "corpus": {
+    "documents": 6,
+    "chunks": 26,
+    "vocabulary": 1315,
+    "avgChunkTokens": 93.7
+  },
+  "totalCases": 20,
+  "retrievalHitRate": 100.0,
+  "answerAccuracy": 100.0,
+  "hallucinationRate": 0.0,
+  "refusalRate": 10.0,
+  "avgLatencyMs": 0.1,
+  "p95LatencyMs": 0,
+  "avgTokens": 200.4,
+  "totalTokens": 4008,
+  "byKind": {
+    "kb": {
+      "count": 14,
+      "correct": 14
+    },
+    "tool": {
+      "count": 4,
+      "correct": 4
+    },
+    "refuse": {
+      "count": 2,
+      "correct": 2
+    }
+  },
+  "cases": [
+    {
+      "caseId": "KB01",
+      "kind": "kb",
+      "question": "10G 光模块接收光功率低于多少 dBm 需要告警？",
+      "answer": "根据《交换机端口光模块与光衰排查·判定阈值》：\n- 接收光功率低于告警阈值时，设备通常上报 `OPTICAL/2/RX_POWER_LOW` 或 `PHY/1/PHY_ERR`，\n- 发端光功率异常（Tx Power 高于 -1 dBm 或低于 -10 dBm）多为模块老化或激光器故障。\n- | 1000BASE-SX/LX | -3 ~ -20 dBm | 低于 -20 dBm | 清洁尾纤端面后复测 |\n- | 10GBASE-SR/LR | -3 ~ -15 dBm | 低于 -15 dBm | 更换光模块或跳线 |\n\n原文依据：接收光功率低于告警阈值时，设备通常上报 `OPTICAL/2/RX_POWER_LOW` 或 `PHY/1/PHY_ERR`，\n伴随 `CRC error` 计数上升。发端光功率异常（Tx Power 高于 -1 dBm 或低于 -10 dBm）多为模块老化或激光器故障。\n\n相关内容：《交换机端口光模块与光衰排查·判定阈值》；《交换机端口光模块与光衰排查·判定阈值》",
+      "keywords": [
+        "-15 dBm"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 1,
+      "tokens": 255,
+      "note": "光衰阈值"
+    },
+    {
+      "caseId": "KB02",
+      "kind": "kb",
+      "question": "工业级宽温模块收光 -9.8 dBm，算故障吗？",
+      "answer": "根据《交换机端口光模块与光衰排查·常见误判》：\n- - 把「光功率 -9.8 dBm」直接判为故障：对工业级宽温模块属于正常偏弱，应结合温度（控制柜内常见 45~55℃）与错包计数判断。\n- | 1000BASE-SX/LX | -3 ~ -20 dBm | 低于 -20 dBm | 清洁尾纤端面后复测 |\n- | 工业级宽温模块 | -3 ~ -9 dBm | 低于 -12 dBm | 重点检查控制柜温度与振动 |\n\n原文依据：- 把「光功率 -9.8 dBm」直接判为故障：对工业级宽温模块属于正常偏弱，应结合温度（控制柜内常见 45~55℃）与错包计数判断。\n- 只看 Rx 不看 Tx：Tx 异常说明本端发送侧故障，更换模块才能解决。\n- 忽略端口 down 的连带告警：端口 down 时无收光，光功率读数不可作为故障依据。\n\n相关内容：《交换机端口光模块与光衰排查·判定阈值》；《交换机端口光模块与光衰排查·判定阈值》",
+      "keywords": [
+        "正常偏弱"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 283,
+      "note": "阈值分模块类型"
+    },
+    {
+      "caseId": "KB03",
+      "kind": "kb",
+      "question": "链路 down 应该按什么顺序排查？",
+      "answer": "根据《链路中断与端口 down 的分层排查·分层定位》：\n- 链路中断按 OSI 自下而上分层排查，避免一上来就怀疑配置：\n- 2. **链路层**：`display interface brief` 看端口 `UP/DOWN`；`display port vlan` 看是否被 shutdown 或 VLAN 未放通。\n- display interface GigabitEthernet 0/0/5\n- display interface brief | include DOWN\n\n原文依据：链路中断按 OSI 自下而上分层排查，避免一上来就怀疑配置：\n\n1. **物理层**：网线/光纤是否插好、端口指示灯是否亮、光模块是否插紧、跳线是否被压折。\n2. **链路层**：`display interface brief` 看端口 `UP/DOWN`；`display port vlan` 看是否被 shutdown 或 VLAN 未放通。\n3. **网络层**：`ping` 对端网关与对端设备管理地址；`display arp` 看 ARP 是否学习到。\n4. **传输层及以上**：业务端口（如 DCS 的 102/44818 端口）是否被 ACL 拦截。\n\n相关内容：《链路中断与端口 down 的分层排查·关键命令（华为 VRP）》；《OSPF 邻居建立与路由排障·邻居无法建立的排查顺序》",
+      "keywords": [
+        "物理层"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 325,
+      "note": "分层排查"
+    },
+    {
+      "caseId": "KB04",
+      "kind": "kb",
+      "question": "端口频繁 up/down 抖动，最可能是什么原因？",
+      "answer": "根据《链路中断与端口 down 的分层排查·判定表》：\n- | 频繁 up/down 抖动 | 光衰临界或接触不良 | 查光功率与 CRC 计数 |\n- 链路中断按 OSI 自下而上分层排查，避免一上来就怀疑配置：\n- 1. **物理层**：网线/光纤是否插好、端口指示灯是否亮、光模块是否插紧、跳线是否被压折。\n\n原文依据：| 现象 | 最可能原因 | 下一步 |\n| --- | --- | --- |\n| 端口 down，对端也 down | 线缆/光模块故障 | 更换跳线或模块 |\n| 本端 up，对端 down | 单通，端口协商或对端 shutdown | 检查对端配置 |\n| 端口 up 但无流量 | VLAN 未放通或 MAC 未学习 | 查 VLAN 与 MAC 表 |\n| 频繁 up/down 抖动 | 光衰临界或接触不良 | 查光功率与 CRC 计数 |\n\n相关内容：《链路中断与端口 down 的分层排查·分层定位》；《OSPF 邻居建立与路由排障·邻居无法建立的排查顺序》",
+      "keywords": [
+        "光衰",
+        "接触不良"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 288,
+      "note": "抖动判定"
+    },
+    {
+      "caseId": "KB05",
+      "kind": "kb",
+      "question": "VLAN ID 的合法范围是多少？",
+      "answer": "根据《VLAN、ACL 与端口配置规范·VLAN 规划》：\n- | VLAN 1 | 保留 | 禁止承载业务流量 |\n- | VLAN 10–99 | 管理网 | 设备管理地址、带外管理 |\n- VLAN ID 合法范围是 **1–4094**，其中 1002–1005 在部分厂商设备上为保留 VLAN，不建议使用。\n- 接入端口统一 `access` 模式并绑定单一 VLAN；级联端口用 `trunk`，只放通必要的 VLAN：\n\n原文依据：| 范围 | 用途 | 说明 |\n| --- | --- | --- |\n| VLAN 1 | 保留 | 禁止承载业务流量 |\n| VLAN 10–99 | 管理网 | 设备管理地址、带外管理 |\n| VLAN 100–199 | 生产控制网 | 与办公网物理或逻辑隔离 |\n| VLAN 200–299 | 办公网 | 用户终端、打印机 |\n| VLAN 300–399 | 无线与访客 | 访客需做 Portal 认证与限速 |\n| VLAN 400–4094 | 预留 | 按项目申请后分配 |\n\nVLAN ID 合法范围是 **1–4094**，其中 1002–1005 在部分厂商设备上为保留 VLAN，不建议使用。\n\n相关内容：《VLAN、ACL 与端口配置规范·端口配置》；《OSPF 邻居建立与路由排障·邻居无法建立的排查顺序》",
+      "keywords": [
+        "4094"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 329,
+      "note": "VLAN 范围"
+    },
+    {
+      "caseId": "KB06",
+      "kind": "kb",
+      "question": "生产控制网一般用哪一段 VLAN？",
+      "answer": "根据《VLAN、ACL 与端口配置规范·VLAN 规划》：\n- | VLAN 1 | 保留 | 禁止承载业务流量 |\n- | VLAN 10–99 | 管理网 | 设备管理地址、带外管理 |\n- | VLAN 100–199 | 生产控制网 | 与办公网物理或逻辑隔离 |\n- - 生产控制网（DCS/PLC）交换机重启会影响产线，**排查优先用只读命令**，禁止直接 `shutdown` 端口做试验。\n\n原文依据：| 范围 | 用途 | 说明 |\n| --- | --- | --- |\n| VLAN 1 | 保留 | 禁止承载业务流量 |\n| VLAN 10–99 | 管理网 | 设备管理地址、带外管理 |\n| VLAN 100–199 | 生产控制网 | 与办公网物理或逻辑隔离 |\n| VLAN 200–299 | 办公网 | 用户终端、打印机 |\n| VLAN 300–399 | 无线与访客 | 访客需做 Portal 认证与限速 |\n| VLAN 400–4094 | 预留 | 按项目申请后分配 |\n\nVLAN ID 合法范围是 **1–4094**，其中 1002–1005 在部分厂商设备上为保留 VLAN，不建议使用。\n\n相关内容：《链路中断与端口 down 的分层排查·工业现场注意点》；《工单分级、SLA 与状态流转·分级标准》",
+      "keywords": [
+        "100"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 327,
+      "note": "VLAN 规划"
+    },
+    {
+      "caseId": "KB07",
+      "kind": "kb",
+      "question": "华为设备基本 ACL 的编号范围是多少？",
+      "answer": "根据《VLAN、ACL 与端口配置规范·ACL 编号规范》：\n- - 华为 VRP：基本 ACL 编号 **2000–2999**，高级 ACL **3000–3999**，二层 ACL 4000–4999。\n- - 思科 IOS：标准 ACL 1–99（扩展 1300–1999），扩展 ACL 100–199（扩展 2000–2699）。\n- ACL 规则按序号递增匹配，**先拒绝后放通**要确认默认策略，否则容易出现「写了一条 deny 但流量照样通」。\n- | 范围 | 用途 | 说明 |\n- | VLAN 1 | 保留 | 禁止承载业务流量 |\n\n原文依据：- 华为 VRP：基本 ACL 编号 **2000–2999**，高级 ACL **3000–3999**，二层 ACL 4000–4999。\n- 思科 IOS：标准 ACL 1–99（扩展 1300–1999），扩展 ACL 100–199（扩展 2000–2699）。\n\nACL 规则按序号递增匹配，**先拒绝后放通**要确认默认策略，否则容易出现「写了一条 deny 但流量照样通」。\n\n相关内容：《VLAN、ACL 与端口配置规范·VLAN 规划》；《链路中断与端口 down 的分层排查·关键命令（华为 VRP）》",
+      "keywords": [
+        "2000"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 286,
+      "note": "ACL 编号"
+    },
+    {
+      "caseId": "KB08",
+      "kind": "kb",
+      "question": "只写 deny 规则会有什么风险？",
+      "answer": "根据《VLAN、ACL 与端口配置规范·ACL 编号规范》：\n- ACL 规则按序号递增匹配，**先拒绝后放通**要确认默认策略，否则容易出现「写了一条 deny 但流量照样通」。\n- | 端口/协议 | 风险 | 处置 |\n- | 23/tcp Telnet | 明文传输账号口令 | 关闭，改用 22/tcp SSH |\n\n原文依据：- 华为 VRP：基本 ACL 编号 **2000–2999**，高级 ACL **3000–3999**，二层 ACL 4000–4999。\n- 思科 IOS：标准 ACL 1–99（扩展 1300–1999），扩展 ACL 100–199（扩展 2000–2699）。\n\nACL 规则按序号递增匹配，**先拒绝后放通**要确认默认策略，否则容易出现「写了一条 deny 但流量照样通」。\n\n相关内容：《等级保护要求：口令、高危端口与日志留存·高危端口与协议》",
+      "keywords": [
+        "默认"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 230,
+      "note": "默认策略"
+    },
+    {
+      "caseId": "KB09",
+      "kind": "kb",
+      "question": "网络配置变更窗口建议安排在什么时间？",
+      "answer": "根据《VLAN、ACL 与端口配置规范·配置变更要求》：\n- 2. 变更窗口避开生产高峰（建议 22:00–次日 6:00）。\n- - 网络设备与安全设备日志留存不少于 **6 个月**（等保三级要求）。\n- - Syslog 集中采集到日志服务器，设备本地缓冲区仅作临时缓存。\n\n原文依据：1. 变更前执行 `display current-configuration` 备份到变更单。\n2. 变更窗口避开生产高峰（建议 22:00–次日 6:00）。\n3. 变更后立即做连通性验证，并在 10 分钟内观察 `display logbuffer` 是否有新增告警。\n4. 回滚脚本随变更单一起提交，回滚窗口不少于 24 小时。\n\n相关内容：《等级保护要求：口令、高危端口与日志留存·日志留存》；《工单分级、SLA 与状态流转·状态机》",
+      "keywords": [
+        "22:00"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 240,
+      "note": "变更窗口"
+    },
+    {
+      "caseId": "KB10",
+      "kind": "kb",
+      "question": "OSPF 邻居卡在 ExStart 阶段，常见原因是什么？",
+      "answer": "根据《OSPF 邻居建立与路由排障·邻居无法建立的排查顺序》：\n- OSPF 邻居状态从 `Down → Init → 2-Way → ExStart → Exchange → Loading → Full`。\n- 卡在不同阶段原因不同：\n- | 卡在 | 常见原因 | 排查命令 |\n- | ExStart | MTU 不一致、Router-ID 冲突 | `display ospf peer verbose` |\n\n原文依据：OSPF 邻居状态从 `Down → Init → 2-Way → ExStart → Exchange → Loading → Full`。卡在不同阶段原因不同：\n\n相关内容：《OSPF 邻居建立与路由排障·邻居无法建立的排查顺序》；《OSPF 邻居建立与路由排障·常见误配置》",
+      "keywords": [
+        "MTU"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 180,
+      "note": "OSPF 状态机"
+    },
+    {
+      "caseId": "KB11",
+      "kind": "kb",
+      "question": "OSPF 邻居一直停在 Init，要查什么？",
+      "answer": "根据《OSPF 邻居建立与路由排障·邻居无法建立的排查顺序》：\n- OSPF 邻居状态从 `Down → Init → 2-Way → ExStart → Exchange → Loading → Full`。\n- | Down / Init | 物理不通、组播被 ACL 拦截、接口未宣告 | `display ospf interface` |\n\n原文依据：OSPF 邻居状态从 `Down → Init → 2-Way → ExStart → Exchange → Loading → Full`。卡在不同阶段原因不同：\n\n相关内容：《OSPF 邻居建立与路由排障·邻居无法建立的排查顺序》；《OSPF 邻居建立与路由排障·常见误配置》",
+      "keywords": [
+        "物理"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 162,
+      "note": "OSPF 排障"
+    },
+    {
+      "caseId": "KB12",
+      "kind": "kb",
+      "question": "P1 工单的恢复时限是多少？",
+      "answer": "根据《工单分级、SLA 与状态流转·分级标准》：\n- | P1 | 生产控制网中断、核心设备宕机、整层或整栋断网 | 15 分钟 | 2 小时 |\n- - P1 工单 30 分钟未受理，自动升级至值班主管。\n\n原文依据：| 级别 | 判定 | 响应时限 | 恢复时限 |\n| --- | --- | --- | --- |\n| P1 | 生产控制网中断、核心设备宕机、整层或整栋断网 | 15 分钟 | 2 小时 |\n| P2 | 单台接入设备故障、局部区域性能劣化、重要业务受影响 | 30 分钟 | 8 小时 |\n| P3 | 一般咨询、配置需求、非关键链路告警 | 4 小时 | 24 小时 |\n\nSLA 时限从工单创建时刻开始计算，挂起（等待厂商/等待备件）需要单独登记并暂停计时。\n\n相关内容：《工单分级、SLA 与状态流转·升级机制》；《工单分级、SLA 与状态流转·告警去重》",
+      "keywords": [
+        "2 小时"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 260,
+      "note": "SLA"
+    },
+    {
+      "caseId": "KB13",
+      "kind": "kb",
+      "question": "P3 工单的响应时限是多少？",
+      "answer": "根据《工单分级、SLA 与状态流转·分级标准》：\n- | P3 | 一般咨询、配置需求、非关键链路告警 | 4 小时 | 24 小时 |\n- - P1 工单 30 分钟未受理，自动升级至值班主管。\n- - P2 工单 2 小时未受理，升级至组长。\n\n原文依据：| 级别 | 判定 | 响应时限 | 恢复时限 |\n| --- | --- | --- | --- |\n| P1 | 生产控制网中断、核心设备宕机、整层或整栋断网 | 15 分钟 | 2 小时 |\n| P2 | 单台接入设备故障、局部区域性能劣化、重要业务受影响 | 30 分钟 | 8 小时 |\n| P3 | 一般咨询、配置需求、非关键链路告警 | 4 小时 | 24 小时 |\n\nSLA 时限从工单创建时刻开始计算，挂起（等待厂商/等待备件）需要单独登记并暂停计时。\n\n相关内容：《工单分级、SLA 与状态流转·升级机制》；《工单分级、SLA 与状态流转·状态机》",
+      "keywords": [
+        "4 小时"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 270,
+      "note": "SLA"
+    },
+    {
+      "caseId": "KB14",
+      "kind": "kb",
+      "question": "同一设备光功率告警连续触发，告警去重窗口是多久？",
+      "answer": "根据《工单分级、SLA 与状态流转·告警去重》：\n- 同一设备 + 同一指标（如 CPU、光功率、端口状态）在 **10 分钟窗口**内连续触发时，只保留一条告警并累加\n- 接收光功率低于告警阈值时，设备通常上报 `OPTICAL/2/RX_POWER_LOW` 或 `PHY/1/PHY_ERR`，\n- 伴随 `CRC error` 计数上升。\n\n原文依据：同一设备 + 同一指标（如 CPU、光功率、端口状态）在 **10 分钟窗口**内连续触发时，只保留一条告警并累加\n`count`，同时刷新 `lastSeenAt`：\n\n- 好处：避免一次光衰在 10 分钟里刷出几十条重复告警，把值班人员的注意力淹没。\n- 窗口结束后若指标恢复，告警自动标记 `RESOLVED`；未恢复则生成新的告警周期。\n- 不同指标之间不合并（CPU 高与光功率低是两个独立的处置动作）。\n\n相关内容：《交换机端口光模块与光衰排查·判定阈值》；《交换机端口光模块与光衰排查·判定阈值》",
+      "keywords": [
+        "10 分钟"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 300,
+      "note": "去重窗口"
+    },
+    {
+      "caseId": "TL01",
+      "kind": "tool",
+      "question": "SW-CORE-01 现在什么状态？",
+      "answer": "SW-CORE-01（核心交换机，10.10.1.1）CPU 31%、内存 46%、温度 42℃，收光 -3.2 dBm；端口 GE0/0/1=up、GE0/0/24=up、GE0/0/48=down；健康状态 WARN。端口 down：GE0/0/48",
+      "keywords": [
+        "CPU 31",
+        "WARN"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [
+        "inspect_device"
+      ],
+      "latencyMs": 0,
+      "tokens": 50,
+      "note": "设备巡检"
+    },
+    {
+      "caseId": "TL02",
+      "kind": "tool",
+      "question": "帮我看下 SW-PROD-01 的光功率",
+      "answer": "SW-PROD-01（生产控制网工业交换机，10.20.3.2）CPU 12%、内存 27%、温度 51℃，收光 -9.8 dBm；端口 XGE0/0/1=up；健康状态 OK。无明显异常",
+      "keywords": [
+        "-9.8"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [
+        "inspect_device"
+      ],
+      "latencyMs": 0,
+      "tokens": 47,
+      "note": "光功率巡检"
+    },
+    {
+      "caseId": "TL03",
+      "kind": "tool",
+      "question": "给 VLAN 120 生成华为配置命令",
+      "answer": "配置草稿如下（未下发）：\n```\nvlan 120\n description AUTO\nquit\n```\n风险提示：未指定端口，配置仅创建 VLAN",
+      "keywords": [
+        "vlan 120"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [
+        "cfg_draft"
+      ],
+      "latencyMs": 0,
+      "tokens": 38,
+      "note": "配置草稿"
+    },
+    {
+      "caseId": "TL04",
+      "kind": "tool",
+      "question": "日志里出现 link down，帮我分析一下",
+      "answer": "识别到 1 类问题：链路断链（建议：按物理层→链路层逐段排查：跳线、光模块、尾纤、对端端口）",
+      "keywords": [
+        "链路断链"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": false,
+      "toolCalls": [
+        "log_analyze"
+      ],
+      "latencyMs": 0,
+      "tokens": 38,
+      "note": "日志分析"
+    },
+    {
+      "caseId": "RF01",
+      "kind": "refuse",
+      "question": "你们公司食堂几点开饭？",
+      "answer": "知识库中没有足够信息回答这个问题：本助手只覆盖网络巡检、故障排查、配置草稿与工单流程，且无法预测未来事件。",
+      "keywords": [
+        "没有足够信息"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": true,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 50,
+      "note": "知识库外问题"
+    },
+    {
+      "caseId": "RF02",
+      "kind": "refuse",
+      "question": "预测一下下个月哪台交换机会先坏？",
+      "answer": "知识库中没有足够信息回答这个问题：本助手只覆盖网络巡检、故障排查、配置草稿与工单流程，且无法预测未来事件。",
+      "keywords": [
+        "没有足够信息"
+      ],
+      "retrievalHit": true,
+      "correct": true,
+      "hallucinated": false,
+      "refused": true,
+      "toolCalls": [],
+      "latencyMs": 0,
+      "tokens": 50,
+      "note": "不可预测问题"
+    }
+  ]
+}
