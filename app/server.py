@@ -152,6 +152,10 @@ async function ask() {
 sendEl.onclick = ask;
 qEl.addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) ask(); });
 
+// 支持 ?q=问题 直接出结果（方便演示、截图和分享链接）
+const initial = new URLSearchParams(location.search).get("q");
+if (initial) { qEl.value = initial; ask(); }
+
 fetch("/api/kb").then(r => r.json()).then(d => {
   document.getElementById("meta").textContent =
     `检索增强问答 · 工具调用 · 越界拒答　|　知识库 ${d.documents} 篇 / ${d.chunks} 块 / 词表 ${d.vocabulary}`;

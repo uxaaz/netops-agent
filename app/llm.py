@@ -140,6 +140,15 @@ def _tool_summary(name: str, result: dict[str, Any]) -> str:
     return json.dumps(result, ensure_ascii=False)
 
 
+def _render_table_row(line: str) -> str:
+    """把 markdown 表格行渲染成「列名：值；值」的句子，避免答案里出现裸竖线。"""
+    cells = [c.strip() for c in line.strip().strip("|").split("|")]
+    cells = [c for c in cells if c]
+    if len(cells) < 2:
+        return line.strip()
+    return cells[0] + "：" + "；".join(cells[1:])
+
+
 def _extract_sentences(text: str, keywords: list[str], limit: int = 4) -> list[str]:
     """从检索块中挑与问题关键词最相关的「行」：表格行整行保留，正文按句切分。
 
@@ -154,7 +163,7 @@ def _extract_sentences(text: str, keywords: list[str], limit: int = 4) -> list[s
         if line.startswith("|"):
             if set(line) <= set("|-: "):  # 表格分隔行无信息量
                 continue
-            units.append(line)
+            units.append(_render_table_row(line))
         else:
             for sent in re.split(r"(?<=[。！？])", line):
                 if sent.strip():
@@ -170,6 +179,7 @@ def _extract_sentences(text: str, keywords: list[str], limit: int = 4) -> list[s
     if not picked:
         picked = units[:2]
     order = {u: i for i, u in enumerate(units)}
+    picked = [u.rstrip("，,；;、") for u in picked]
     picked.sort(key=lambda u: order.get(u, 0))
     return picked
 
@@ -179,6 +189,19 @@ _OUT_OF_SCOPE_RE = re.compile(
     r"预测|下个月|下周|明天|未来|会不会|猜|先坏|哪个先|食堂|午饭|工资|天气|股票|星座|"
     r"你是谁|你会什么|讲个笑话|写首诗",
 )
+
+
+def _unique_hits(hits: list) -> list:
+    """按「文档·小节」去重，避免同一篇文档在来源列表里重复出现。"""
+    seen: set[tuple[str, str]] = set()
+    out = []
+    for hit in hits:
+        key = (hit.chunk.doc_title, hit.chunk.section)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(hit)
+    return out
 
 
 def _is_out_of_scope(question: str) -> bool:
@@ -249,7 +272,14 @@ class RuleBasedAgent:
         if len(evidence) > MAX_ANSWER_CHARS - len(body) - 40:
             evidence = evidence[: max(200, MAX_ANSWER_CHARS - len(body) - 40)] + "…"
 
-        related = [h.chunk for h in hits[1:] if h.score >= RELEVANCE_FLOOR * 2]
+        # 相关内容：排除与主答案同文档同小节的块，避免重复
+        related: list = []
+        seen_rel = {(best.doc_title, best.section)}
+        for hit in hits[1:]:
+            key = (hit.chunk.doc_title, hit.chunk.section)
+            if hit.score >= RELEVANCE_FLOOR * 2 and key not in seen_rel:
+                seen_rel.add(key)
+                related.append(hit.chunk)
         extra = ""
         if related:
             extra = "\n\n相关内容：" + "；".join(f"《{c.doc_title}·{c.section}》" for c in related)
@@ -258,7 +288,7 @@ class RuleBasedAgent:
         latency = int((time.perf_counter() - started) * 1000)
         return Answer(
             text=text,
-            sources=[h.to_dict() for h in hits],
+            sources=[h.to_dict() for h in _unique_hits(hits)],
             latency_ms=latency,
             tokens=estimate_tokens(text),
         )
@@ -322,7 +352,7 @@ class OpenAICompatAgent:
                 latency = int((time.perf_counter() - started) * 1000)
                 return Answer(
                     text=text,
-                    sources=[h.to_dict() for h in hits],
+                    sources=[h.to_dict() for h in _unique_hits(hits)],
                     tool_calls=tool_calls,
                     latency_ms=latency,
                     tokens=estimate_tokens(text) + estimate_tokens(context),

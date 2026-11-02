@@ -7,6 +7,22 @@
 > 引用原文与拒答。仓库同时提供了 `OpenAICompatAgent` 作为接入真实模型的示例实现（当前环境无外网，
 > **未在本机实测**，README 与代码注释均已标注）。
 
+## 演示
+
+仓库内 `docs/` 是真实运行截图（`docs/capture-shots.ps1` 可重新生成）：
+
+| 知识库问答（带出处） | 工具调用（实时设备数据） | 越界拒答 |
+| --- | --- | --- |
+| ![chat](docs/chat.png) | ![tool](docs/chat-tool.png) | ![refuse](docs/chat-refuse.png) |
+
+一键启动并打开一个已问答好的页面：
+
+```powershell
+.\demo.ps1
+```
+
+也可以手动起服务后访问 `http://127.0.0.1:8000/?q=你的问题`，`?q=` 会直接触发一次问答，方便演示与分享链接。
+
 ## 亮点
 
 | 项 | 结果 | 复现方式 |
@@ -15,7 +31,7 @@
 | 检索命中率 | **100.0%** | 同上，结果写 `eval-report.json` |
 | 回答正确率 | **100.0%** | 同上 |
 | 幻觉率 | **0.0%**（越界问题全部拒答） | 同上 |
-| 平均 token / 延迟 | 200 tokens / 0.1 ms | 同上 |
+| 平均 token / 延迟 | ≈190 tokens / 0.1 ms | 同上 |
 | 单元测试 | **24 个全部通过** | `python -m unittest discover -s tests -v` |
 | 运行依赖 | 无（Python 3.10+ 标准库） | `python -m app.server` |
 

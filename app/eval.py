@@ -149,12 +149,17 @@ def _print_summary(report: dict) -> None:
     for r in report["cases"]:
         print(
             f"| {r['caseId']} | {r['kind']} | {'是' if r['retrievalHit'] else '否'} | "
-            f"{'✅' if r['correct'] else '❌'} | {'⚠️' if r['hallucinated'] else ''} | {r['tokens']} | {r['question']} |"
+            f"{'OK' if r['correct'] else 'FAIL'} | {'HALLU' if r['hallucinated'] else '-'} | {r['tokens']} | {r['question']} |"
         )
     print(f"\n报告写入：{REPORT_PATH}")
 
 
 if __name__ == "__main__":
+    # Windows 控制台默认 GBK，中文/符号混排会 UnicodeEncodeError，这里强制 UTF-8
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
     kb_dir = KB_DIR
     if not kb_dir.exists():
         raise SystemExit(f"知识库目录不存在：{kb_dir}")
